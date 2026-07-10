@@ -4,20 +4,22 @@
   <meta charset="utf-8">
   
   
-  <title>小组分工说明 | 软件开发工具实践</title>
+  <title>实验五 虚拟机安装与使用 | 软件开发工具实践</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="本项目由第六组 6 名成员共同完成。为了让任务清晰、成果可追踪，小组按照“环境、文档、Linux、远程管理、部署、整合”进行分工。    成员 角色 主要任务 产出    何银尧 组长&#x2F;集成负责人 统筹进度、搭建展示站点、整合报告和最终提交 总报告、源码仓库、展示站点   龚嫣然 远程管理负责人 SSH 服务、密钥认证、SCP&#x2F;rsync 文件传输、远程 Git 仓库验证 实验">
+  <meta name="description" content="实验五的目标是在 VirtualBox 中安装 Ubuntu Server 22.04 LTS，并通过模板机克隆构建多机虚拟化环境，为后续 Linux 配置、SSH 远程管理和 Web 部署实验准备基础环境。 本实验已根据小组成员完成的实验五报告整理，原始材料包含虚拟机创建、网络配置、克隆节点和连通性验证过程。 实验目标 安装 VirtualBox 和 Ubuntu Server 22.04 LT">
 <meta property="og:type" content="article">
-<meta property="og:title" content="小组分工说明">
-<meta property="og:url" content="https://cerry-han.github.io/software-tools-practice/2026/07/10/01-team-division/index.html">
+<meta property="og:title" content="实验五 虚拟机安装与使用">
+<meta property="og:url" content="https://cerry-han.github.io/software-tools-practice/2026/07/10/05-virtual-machine-installation/index.html">
 <meta property="og:site_name" content="软件开发工具实践">
-<meta property="og:description" content="本项目由第六组 6 名成员共同完成。为了让任务清晰、成果可追踪，小组按照“环境、文档、Linux、远程管理、部署、整合”进行分工。    成员 角色 主要任务 产出    何银尧 组长&#x2F;集成负责人 统筹进度、搭建展示站点、整合报告和最终提交 总报告、源码仓库、展示站点   龚嫣然 远程管理负责人 SSH 服务、密钥认证、SCP&#x2F;rsync 文件传输、远程 Git 仓库验证 实验">
+<meta property="og:description" content="实验五的目标是在 VirtualBox 中安装 Ubuntu Server 22.04 LTS，并通过模板机克隆构建多机虚拟化环境，为后续 Linux 配置、SSH 远程管理和 Web 部署实验准备基础环境。 本实验已根据小组成员完成的实验五报告整理，原始材料包含虚拟机创建、网络配置、克隆节点和连通性验证过程。 实验目标 安装 VirtualBox 和 Ubuntu Server 22.04 LT">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-07-10T07:55:00.000Z">
+<meta property="article:published_time" content="2026-07-10T09:30:00.000Z">
 <meta property="article:modified_time" content="2026-07-10T12:47:40.365Z">
 <meta property="article:author" content="第六组">
-<meta property="article:tag" content="Git">
-<meta property="article:tag" content="Teamwork">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="VirtualBox">
+<meta property="article:tag" content="Ubuntu Server">
+<meta property="article:tag" content="Host-Only">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternate" href="/software-tools-practice/atom.xml" title="软件开发工具实践" type="application/atom+xml">
@@ -79,14 +81,14 @@
 </header>
 
       <div class="outer">
-        <section id="main"><article id="post-01-team-division" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+        <section id="main"><article id="post-05-virtual-machine-installation" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
-    <a href="/software-tools-practice/2026/07/10/01-team-division/" class="article-date">
-  <time class="dt-published" datetime="2026-07-10T07:55:00.000Z" itemprop="datePublished">2026-07-10</time>
+    <a href="/software-tools-practice/2026/07/10/05-virtual-machine-installation/" class="article-date">
+  <time class="dt-published" datetime="2026-07-10T09:30:00.000Z" itemprop="datePublished">2026-07-10</time>
 </a>
     
   <div class="article-category">
-    <a class="article-category-link" href="/software-tools-practice/categories/%E8%AF%BE%E7%A8%8B%E9%A1%B9%E7%9B%AE/">课程项目</a>
+    <a class="article-category-link" href="/software-tools-practice/categories/%E5%AE%9E%E9%AA%8C%E8%AE%B0%E5%BD%95/">实验记录</a>
   </div>
 
   </div>
@@ -97,7 +99,7 @@
         
   
     <h1 class="p-name article-title" itemprop="headline name">
-      小组分工说明
+      实验五 虚拟机安装与使用
     </h1>
   
 
@@ -105,68 +107,63 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <p>本项目由第六组 6 名成员共同完成。为了让任务清晰、成果可追踪，小组按照“环境、文档、Linux、远程管理、部署、整合”进行分工。</p>
-<table>
+        <p>实验五的目标是在 VirtualBox 中安装 Ubuntu Server 22.04 LTS，并通过模板机克隆构建多机虚拟化环境，为后续 Linux 配置、SSH 远程管理和 Web 部署实验准备基础环境。</p>
+<p>本实验已根据小组成员完成的实验五报告整理，原始材料包含虚拟机创建、网络配置、克隆节点和连通性验证过程。</p>
+<h2 id="实验目标"><a href="#实验目标" class="headerlink" title="实验目标"></a>实验目标</h2><ul>
+<li>安装 VirtualBox 和 Ubuntu Server 22.04 LTS。</li>
+<li>创建 <code>ubuntu-template</code> 模板机。</li>
+<li>配置 NAT + Host-Only 双网卡。</li>
+<li>设置模板机静态 IP 为 <code>192.168.56.101</code>。</li>
+<li>克隆生成 <code>node1</code>、<code>node2</code>、<code>node3</code>。</li>
+<li>验证虚拟机访问外网和虚拟机之间互通。</li>
+</ul>
+<h2 id="节点规划"><a href="#节点规划" class="headerlink" title="节点规划"></a>节点规划</h2><table>
 <thead>
 <tr>
-<th>成员</th>
-<th>角色</th>
-<th>主要任务</th>
-<th>产出</th>
+<th>节点</th>
+<th>主机名</th>
+<th>Host-Only IP</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>何银尧</td>
-<td>组长&#x2F;集成负责人</td>
-<td>统筹进度、搭建展示站点、整合报告和最终提交</td>
-<td>总报告、源码仓库、展示站点</td>
+<td>模板机</td>
+<td>template</td>
+<td>192.168.56.101</td>
 </tr>
 <tr>
-<td>龚嫣然</td>
-<td>远程管理负责人</td>
-<td>SSH 服务、密钥认证、SCP&#x2F;rsync 文件传输、远程 Git 仓库验证</td>
-<td>实验七材料</td>
+<td>节点 1</td>
+<td>node1</td>
+<td>192.168.56.102</td>
 </tr>
 <tr>
-<td>董晗</td>
-<td>Web 环境与站点构建负责人</td>
-<td>Node.js、npm、Git、Hexo 环境配置和站点构建</td>
-<td>实验二&#x2F;四材料</td>
+<td>节点 2</td>
+<td>node2</td>
+<td>192.168.56.103</td>
 </tr>
 <tr>
-<td>谢娩婷</td>
-<td>文档与代码编辑器负责人</td>
-<td>VS Code、Markdown 插件、实验文档编辑和预览</td>
-<td>实验三材料</td>
-</tr>
-<tr>
-<td>任鑫瑜</td>
-<td>Linux&#x2F;虚拟机负责人</td>
-<td>VirtualBox、Ubuntu Server、双网卡和 Linux 基础配置</td>
-<td>实验五&#x2F;六材料</td>
-</tr>
-<tr>
-<td>程奕菲</td>
-<td>部署与验收材料负责人</td>
-<td>GitHub Actions、GitHub Pages、Nginx&#x2F;虚拟机部署和验收素材整理</td>
-<td>实验八材料</td>
+<td>节点 3</td>
+<td>node3</td>
+<td>192.168.56.104</td>
 </tr>
 </tbody></table>
-<h2 id="协作方式"><a href="#协作方式" class="headerlink" title="协作方式"></a>协作方式</h2><ul>
-<li>使用 GitHub 仓库统一管理源码。</li>
-<li>每次修改后提交清晰的 commit message。</li>
-<li>截图按实验编号分类保存。</li>
-<li>最终由组长统一整合 PDF 报告和源码包。</li>
-</ul>
+<h2 id="网络配置"><a href="#网络配置" class="headerlink" title="网络配置"></a>网络配置</h2><p>模板机 netplan 配置如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">network:</span></span><br><span class="line">  <span class="attr">version:</span> <span class="number">2</span></span><br><span class="line">  <span class="attr">renderer:</span> <span class="string">networkd</span></span><br><span class="line">  <span class="attr">ethernets:</span></span><br><span class="line">    <span class="attr">enp0s3:</span></span><br><span class="line">      <span class="attr">dhcp4:</span> <span class="literal">yes</span></span><br><span class="line">    <span class="attr">enp0s8:</span></span><br><span class="line">      <span class="attr">dhcp4:</span> <span class="literal">no</span></span><br><span class="line">      <span class="attr">addresses:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="number">192.168</span><span class="number">.56</span><span class="number">.101</span><span class="string">/24</span></span><br><span class="line">      <span class="attr">nameservers:</span></span><br><span class="line">        <span class="attr">addresses:</span> [<span class="number">8.8</span><span class="number">.8</span><span class="number">.8</span>, <span class="number">114.114</span><span class="number">.114</span><span class="number">.114</span>]</span><br></pre></td></tr></table></figure>
+
+<p>克隆机只需要把 Host-Only 地址分别改为 <code>192.168.56.102/24</code>、<code>192.168.56.103/24</code> 和 <code>192.168.56.104/24</code>。</p>
+<h2 id="验证命令"><a href="#验证命令" class="headerlink" title="验证命令"></a>验证命令</h2><p>在 node1 中执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ping -c 3 8.8.8.8</span><br><span class="line">ping -c 3 192.168.56.1</span><br><span class="line">ping -c 3 node2</span><br><span class="line">ping -c 3 node3</span><br></pre></td></tr></table></figure>
+
+<p>验证结果显示，node1 可访问外网、宿主机地址，并可通过 Host-Only 网络访问 node2 和 node3。宿主机到 node1、node1 到 node2 的 SSH 远程登录也验证成功。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>实验五完成后，课程项目将具备可复用的多机 Linux 实验环境。后续实验六、实验七和实验八都可以直接基于该虚拟机环境继续开展。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://cerry-han.github.io/software-tools-practice/2026/07/10/01-team-division/" data-id="cmrexl0yz0001sc2cgs0kas7d" data-title="小组分工说明" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://cerry-han.github.io/software-tools-practice/2026/07/10/05-virtual-machine-installation/" data-id="cmrexl0z50009sc2c30sw1khr" data-title="实验五 虚拟机安装与使用" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/software-tools-practice/tags/Git/" rel="tag">Git</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/software-tools-practice/tags/Teamwork/" rel="tag">Teamwork</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/software-tools-practice/tags/Host-Only/" rel="tag">Host-Only</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/software-tools-practice/tags/Linux/" rel="tag">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/software-tools-practice/tags/Ubuntu-Server/" rel="tag">Ubuntu Server</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/software-tools-practice/tags/VirtualBox/" rel="tag">VirtualBox</a></li></ul>
 
     </footer>
   </div>
@@ -174,19 +171,19 @@
     
 <nav id="article-nav">
   
-    <a href="/software-tools-practice/2026/07/10/02-web-development-environment/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/software-tools-practice/2026/07/10/06-linux-environment-configuration/" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">前一篇</strong>
       <div class="article-nav-title">
         
-          实验二 Web 软件开发环境
+          实验六 Linux 环境配置
         
       </div>
     </a>
   
   
-    <a href="/software-tools-practice/2026/07/10/00-course-overview/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/software-tools-practice/2026/07/10/04-web-site-construction/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">后一篇</strong>
-      <div class="article-nav-title">软件开发工具实践课程项目总览</div>
+      <div class="article-nav-title">实验四 Web 站点构建</div>
     </a>
   
 </nav>
