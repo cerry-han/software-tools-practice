@@ -103,8 +103,9 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <p>实验八完成课程展示站点的自动化部署。项目使用 GitHub Actions 构建 Hexo 静态站点，并发布到 GitHub Pages。</p>
-<h2 id="部署信息"><a href="#部署信息" class="headerlink" title="部署信息"></a>部署信息</h2><table>
+        <p>实验八完成课程展示站点从源码构建到线上发布的完整流程。本实验包含两条部署路线：一条是 GitHub Actions 自动构建并发布到 GitHub Pages，另一条是将 Hexo 生成的静态文件部署到 Ubuntu Server 虚拟机中的 Nginx 服务。</p>
+<h2 id="一、实验目的"><a href="#一、实验目的" class="headerlink" title="一、实验目的"></a>一、实验目的</h2><p>通过本实验掌握静态站点的构建、发布和访问验证流程。实验重点包括 GitHub Actions 自动化部署、GitHub Pages 在线托管、Ubuntu Server 中 Nginx Web 服务配置，以及通过 SSH&#x2F;SCP 将静态站点发布到虚拟机服务器。</p>
+<h2 id="二、实验环境"><a href="#二、实验环境" class="headerlink" title="二、实验环境"></a>二、实验环境</h2><table>
 <thead>
 <tr>
 <th>项目</th>
@@ -116,47 +117,199 @@
 <td><a target="_blank" rel="noopener" href="https://github.com/cerry-han/software-tools-practice">https://github.com/cerry-han/software-tools-practice</a></td>
 </tr>
 <tr>
-<td>部署方式</td>
-<td>GitHub Actions + GitHub Pages</td>
+<td>静态站点框架</td>
+<td>Hexo</td>
 </tr>
 <tr>
-<td>发布分支</td>
-<td>gh-pages</td>
+<td>自动部署</td>
+<td>GitHub Actions + GitHub Pages</td>
 </tr>
 <tr>
 <td>线上地址</td>
 <td><a href="https://cerry-han.github.io/software-tools-practice/">https://cerry-han.github.io/software-tools-practice/</a></td>
 </tr>
+<tr>
+<td>虚拟机系统</td>
+<td>Ubuntu Server 22.04.5 LTS</td>
+</tr>
+<tr>
+<td>虚拟机主机名</td>
+<td>node2</td>
+</tr>
+<tr>
+<td>虚拟机用户</td>
+<td>dev</td>
+</tr>
+<tr>
+<td>Host-Only 地址</td>
+<td>192.168.56.102</td>
+</tr>
+<tr>
+<td>Web 服务</td>
+<td>Nginx</td>
+</tr>
+<tr>
+<td>虚拟机访问地址</td>
+<td><a target="_blank" rel="noopener" href="http://192.168.56.102/software-tools-practice/">http://192.168.56.102/software-tools-practice/</a></td>
+</tr>
 </tbody></table>
-<h2 id="自动化部署流程"><a href="#自动化部署流程" class="headerlink" title="自动化部署流程"></a>自动化部署流程</h2><p>项目推送到 <code>main</code> 分支后，GitHub Actions 自动执行：</p>
-<ol>
-<li>检出源码。</li>
-<li>安装 Node.js。</li>
-<li>安装 npm 依赖。</li>
-<li>执行 <code>npm run build</code> 生成静态站点。</li>
-<li>将 <code>public/</code> 目录发布到 <code>gh-pages</code> 分支。</li>
-</ol>
-<p>核心配置文件：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.github/workflows/deploy.yml</span><br></pre></td></tr></table></figure>
+<h2 id="三、实验过程"><a href="#三、实验过程" class="headerlink" title="三、实验过程"></a>三、实验过程</h2><h3 id="步骤一：配置-GitHub-Actions"><a href="#步骤一：配置-GitHub-Actions" class="headerlink" title="步骤一：配置 GitHub Actions"></a>步骤一：配置 GitHub Actions</h3><p>在项目目录中创建 <code>.github/workflows/deploy.yml</code>，配置当 <code>main</code> 分支发生 push 时自动执行构建和发布。工作流主要步骤包括检出源码、安装 Node.js、安装 npm 依赖、执行 Hexo 构建，并把 <code>public/</code> 目录发布到 <code>gh-pages</code> 分支。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">Deploy</span> <span class="string">Hexo</span> <span class="string">site</span></span><br><span class="line"></span><br><span class="line"><span class="attr">on:</span></span><br><span class="line">  <span class="attr">push:</span></span><br><span class="line">    <span class="attr">branches:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">main</span></span><br><span class="line">  <span class="attr">workflow_dispatch:</span></span><br><span class="line"></span><br><span class="line"><span class="attr">permissions:</span></span><br><span class="line">  <span class="attr">contents:</span> <span class="string">write</span></span><br><span class="line"></span><br><span class="line"><span class="attr">jobs:</span></span><br><span class="line">  <span class="attr">build-and-deploy:</span></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-latest</span></span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Checkout</span> <span class="string">source</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">actions/checkout@v4</span></span><br><span class="line"></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Setup</span> <span class="string">Node.js</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">actions/setup-node@v4</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">node-version:</span> <span class="string">&quot;20&quot;</span></span><br><span class="line">          <span class="attr">cache:</span> <span class="string">npm</span></span><br><span class="line"></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Install</span> <span class="string">dependencies</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">npm</span> <span class="string">install</span></span><br><span class="line"></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Generate</span> <span class="string">static</span> <span class="string">site</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">npm</span> <span class="string">run</span> <span class="string">build</span></span><br><span class="line"></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Deploy</span> <span class="string">to</span> <span class="string">gh-pages</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">peaceiris/actions-gh-pages@v3</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">github_token:</span> <span class="string">$&#123;&#123;</span> <span class="string">secrets.GITHUB_TOKEN</span> <span class="string">&#125;&#125;</span></span><br><span class="line">          <span class="attr">publish_dir:</span> <span class="string">./public</span></span><br><span class="line">          <span class="attr">publish_branch:</span> <span class="string">gh-pages</span></span><br></pre></td></tr></table></figure>
 
-<h2 id="工作流配置"><a href="#工作流配置" class="headerlink" title="工作流配置"></a>工作流配置</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">Deploy</span> <span class="string">Hexo</span> <span class="string">site</span></span><br><span class="line"></span><br><span class="line"><span class="attr">on:</span></span><br><span class="line">  <span class="attr">push:</span></span><br><span class="line">    <span class="attr">branches:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">main</span></span><br><span class="line">  <span class="attr">workflow_dispatch:</span></span><br><span class="line"></span><br><span class="line"><span class="attr">permissions:</span></span><br><span class="line">  <span class="attr">contents:</span> <span class="string">write</span></span><br><span class="line"></span><br><span class="line"><span class="attr">jobs:</span></span><br><span class="line">  <span class="attr">build-and-deploy:</span></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-latest</span></span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Checkout</span> <span class="string">source</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">actions/checkout@v4</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Setup</span> <span class="string">Node.js</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">actions/setup-node@v4</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">node-version:</span> <span class="string">&quot;20&quot;</span></span><br><span class="line">          <span class="attr">cache:</span> <span class="string">npm</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Install</span> <span class="string">dependencies</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">npm</span> <span class="string">install</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Generate</span> <span class="string">static</span> <span class="string">site</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">npm</span> <span class="string">run</span> <span class="string">build</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Deploy</span> <span class="string">to</span> <span class="string">gh-pages</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">peaceiris/actions-gh-pages@v3</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">github_token:</span> <span class="string">$&#123;&#123;</span> <span class="string">secrets.GITHUB_TOKEN</span> <span class="string">&#125;&#125;</span></span><br><span class="line">          <span class="attr">publish_dir:</span> <span class="string">./public</span></span><br><span class="line">          <span class="attr">publish_branch:</span> <span class="string">gh-pages</span></span><br></pre></td></tr></table></figure>
+<p><img src="/software-tools-practice/images/exp8/exp8_01_actions_success.png" alt="GitHub Actions 自动部署成功"></p>
+<p><em>图1：GitHub Actions 自动部署任务执行成功</em></p>
+<h3 id="步骤二：启用-GitHub-Pages"><a href="#步骤二：启用-GitHub-Pages" class="headerlink" title="步骤二：启用 GitHub Pages"></a>步骤二：启用 GitHub Pages</h3><p>进入 GitHub 仓库的 Settings -&gt; Pages，将发布来源设置为 <code>gh-pages</code> 分支，目录选择 <code>/root</code>。保存后 GitHub Pages 会生成线上站点地址。</p>
+<p><img src="/software-tools-practice/images/exp8/exp8_02_pages_live.png" alt="GitHub Pages 站点已上线"></p>
+<p><em>图2：GitHub Pages 显示站点已上线</em></p>
+<h3 id="步骤三：确认虚拟机远程连接"><a href="#步骤三：确认虚拟机远程连接" class="headerlink" title="步骤三：确认虚拟机远程连接"></a>步骤三：确认虚拟机远程连接</h3><p>在实验五和实验六中已经完成 Ubuntu Server 虚拟机安装和网络配置，实验七中完成 SSH 远程登录。本实验继续使用虚拟机 <code>node2</code> 作为部署服务器，Host-Only 地址为 <code>192.168.56.102</code>。</p>
+<p>在 Windows PowerShell 中远程登录虚拟机：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ssh dev@192.168.56.102</span><br><span class="line">hostname</span><br><span class="line"><span class="built_in">whoami</span></span><br><span class="line"><span class="built_in">exit</span></span><br></pre></td></tr></table></figure>
 
-<h2 id="服务器部署"><a href="#服务器部署" class="headerlink" title="服务器部署"></a>服务器部署</h2><p>在 Ubuntu 虚拟机 node2 上安装 Nginx，并使用 SCP&#x2F;rsync 同步 Hexo 的 <code>public/</code> 目录：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install -y nginx</span><br><span class="line"><span class="built_in">sudo</span> systemctl <span class="built_in">enable</span> --now nginx</span><br><span class="line">npm run build</span><br><span class="line">scp -r public/* dev@192.168.56.102:/var/www/blog/software-tools-practice/</span><br></pre></td></tr></table></figure>
+<p><img src="/software-tools-practice/images/exp8/exp8_03_ssh_remote.png" alt="SSH 远程登录虚拟机"></p>
+<p><em>图3：通过 SSH 登录 node2 并验证主机名和用户</em></p>
+<h3 id="步骤四：安装并启动-Nginx"><a href="#步骤四：安装并启动-Nginx" class="headerlink" title="步骤四：安装并启动 Nginx"></a>步骤四：安装并启动 Nginx</h3><p>在 Ubuntu Server 中安装 Nginx，并设置为立即启动和开机自启。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt update</span><br><span class="line"><span class="built_in">sudo</span> apt install -y nginx</span><br><span class="line"><span class="built_in">sudo</span> systemctl <span class="built_in">enable</span> --now nginx</span><br><span class="line"><span class="built_in">sudo</span> systemctl status nginx</span><br></pre></td></tr></table></figure>
 
-<p>虚拟机访问地址：</p>
+<p>当状态显示 <code>active (running)</code> 时，说明 Nginx 服务已经正常运行。</p>
+<p><img src="/software-tools-practice/images/exp8/exp8_04_nginx_status.png" alt="Nginx 服务运行状态"></p>
+<p><em>图4：Ubuntu 虚拟机中 Nginx 服务 active (running)</em></p>
+<h3 id="步骤五：配置-Nginx-静态站点目录"><a href="#步骤五：配置-Nginx-静态站点目录" class="headerlink" title="步骤五：配置 Nginx 静态站点目录"></a>步骤五：配置 Nginx 静态站点目录</h3><p>为了让 GitHub Pages 和虚拟机部署使用一致的访问路径，将站点部署到 <code>/var/www/blog/software-tools-practice/</code>。这样浏览器可以通过 <code>/software-tools-practice/</code> 子路径访问站点。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">mkdir</span> -p /var/www/blog/software-tools-practice</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">chown</span> -R dev:dev /var/www/blog</span><br></pre></td></tr></table></figure>
+
+<p>创建 Nginx 站点配置 <code>/etc/nginx/sites-available/blog</code>：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">server</span> &#123;</span><br><span class="line">    <span class="attribute">listen</span> <span class="number">80</span>;</span><br><span class="line">    <span class="attribute">server_name</span> _;</span><br><span class="line">    <span class="attribute">root</span> /var/www/blog;</span><br><span class="line">    <span class="attribute">index</span> index.html;</span><br><span class="line"></span><br><span class="line">    <span class="section">location</span> / &#123;</span><br><span class="line">        <span class="attribute">try_files</span> <span class="variable">$uri</span> <span class="variable">$uri</span>/ =<span class="number">404</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>启用配置并检查语法：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">ln</span> -sf /etc/nginx/sites-available/blog /etc/nginx/sites-enabled/blog</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">rm</span> -f /etc/nginx/sites-enabled/default</span><br><span class="line"><span class="built_in">sudo</span> nginx -t</span><br><span class="line"><span class="built_in">sudo</span> systemctl reload nginx</span><br></pre></td></tr></table></figure>
+
+<p><img src="/software-tools-practice/images/exp8/exp8_05_nginx_test.png" alt="Nginx 配置检查成功"></p>
+<p><em>图5：Nginx 配置语法检查成功</em></p>
+<h3 id="步骤六：构建并同步静态站点"><a href="#步骤六：构建并同步静态站点" class="headerlink" title="步骤六：构建并同步静态站点"></a>步骤六：构建并同步静态站点</h3><p>在本地 Hexo 项目中生成静态文件，然后通过 SCP 或 rsync 同步到虚拟机 Nginx 目录。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm run build</span><br><span class="line">scp -r public/* dev@192.168.56.102:/var/www/blog/software-tools-practice/</span><br></pre></td></tr></table></figure>
+
+<p>如果使用 rsync，可以执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -avz --delete -e ssh public/ dev@192.168.56.102:/var/www/blog/software-tools-practice/</span><br></pre></td></tr></table></figure>
+
+<h3 id="步骤七：浏览器访问验证"><a href="#步骤七：浏览器访问验证" class="headerlink" title="步骤七：浏览器访问验证"></a>步骤七：浏览器访问验证</h3><p>部署完成后，在宿主机浏览器中访问虚拟机站点：</p>
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.56.102/software-tools-practice/</span><br></pre></td></tr></table></figure>
 
-<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>实验八实现了课程站点从源码到线上访问的完整流程。自动化部署降低了手动上传文件的成本，也让每次修改网站内容后都可以通过 GitHub Actions 自动发布；Nginx 和 rsync 部署流程则补充了 Linux 服务器中的传统静态站点发布方式。</p>
+<p>页面能够显示课程展示站点，说明 Nginx 静态站点部署成功。</p>
+<p><img src="/software-tools-practice/images/exp8/exp8_06_vm_site.png" alt="虚拟机地址访问课程展示站点"></p>
+<p><em>图6：通过虚拟机地址访问课程展示站点</em></p>
+<p>同时访问 GitHub Pages 线上站点，确认自动部署版本也能正常显示实验八内容。</p>
+<p><img src="/software-tools-practice/images/exp8/exp8_07_github_site.png" alt="GitHub Pages 线上站点显示实验八内容"></p>
+<p><em>图7：GitHub Pages 线上站点显示实验八内容</em></p>
+<h2 id="四、实验结果"><a href="#四、实验结果" class="headerlink" title="四、实验结果"></a>四、实验结果</h2><table>
+<thead>
+<tr>
+<th>测试项</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GitHub Actions 自动构建</td>
+<td>成功</td>
+</tr>
+<tr>
+<td>静态文件发布到 <code>gh-pages</code></td>
+<td>成功</td>
+</tr>
+<tr>
+<td>GitHub Pages 线上访问</td>
+<td>成功</td>
+</tr>
+<tr>
+<td>SSH 远程登录虚拟机</td>
+<td>成功</td>
+</tr>
+<tr>
+<td>Nginx 服务运行</td>
+<td>成功</td>
+</tr>
+<tr>
+<td>Nginx 配置语法检查</td>
+<td>成功</td>
+</tr>
+<tr>
+<td>虚拟机站点访问</td>
+<td>成功</td>
+</tr>
+<tr>
+<td>页面样式与图片加载</td>
+<td>成功</td>
+</tr>
+</tbody></table>
+<h2 id="五、知识总结"><a href="#五、知识总结" class="headerlink" title="五、知识总结"></a>五、知识总结</h2><table>
+<thead>
+<tr>
+<th>知识点</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GitHub Actions</td>
+<td>用于自动执行构建和部署流程，减少手动发布步骤</td>
+</tr>
+<tr>
+<td>GitHub Pages</td>
+<td>适合托管静态站点，可直接从仓库分支发布页面</td>
+</tr>
+<tr>
+<td>Hexo <code>public/</code></td>
+<td>Hexo 构建后的静态网页目录，可直接部署到 Web 服务器</td>
+</tr>
+<tr>
+<td>Nginx</td>
+<td>常用 Web 服务器，可以托管静态文件并提供浏览器访问</td>
+</tr>
+<tr>
+<td>SSH&#x2F;SCP&#x2F;rsync</td>
+<td>用于远程登录服务器和同步部署文件</td>
+</tr>
+<tr>
+<td>站点根路径</td>
+<td>GitHub Pages 项目页和虚拟机部署都需要处理 <code>/software-tools-practice/</code> 子路径</td>
+</tr>
+</tbody></table>
+<h2 id="六、出现问题与解决方法"><a href="#六、出现问题与解决方法" class="headerlink" title="六、出现问题与解决方法"></a>六、出现问题与解决方法</h2><table>
+<thead>
+<tr>
+<th>问题</th>
+<th>原因</th>
+<th>解决方法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GitHub 推送需要凭据</td>
+<td>本地终端没有可用 GitHub 登录凭据</td>
+<td>在已登录 GitHub 的终端执行 <code>git push</code></td>
+</tr>
+<tr>
+<td>GitHub Pages 显示 404</td>
+<td>发布分支或目录未配置正确</td>
+<td>将 Pages 来源设置为 <code>gh-pages</code> 分支 <code>/root</code></td>
+</tr>
+<tr>
+<td>虚拟机页面样式或图片缺失</td>
+<td>部署目录与 Hexo <code>root</code> 子路径不一致</td>
+<td>将静态文件部署到 <code>/var/www/blog/software-tools-practice/</code></td>
+</tr>
+<tr>
+<td>Nginx 显示默认页</td>
+<td>默认站点配置仍然启用</td>
+<td>删除 <code>/etc/nginx/sites-enabled/default</code> 并重新加载 Nginx</td>
+</tr>
+</tbody></table>
+<h2 id="七、心得体会"><a href="#七、心得体会" class="headerlink" title="七、心得体会"></a>七、心得体会</h2><p>实验八把前面完成的 Web 开发环境、Git 代码管理、Linux 虚拟机、SSH 远程管理全部串联起来，形成了一个可以真实访问的课程展示站点。通过 GitHub Pages 和 Nginx 两种部署方式的对比，可以看到自动化部署适合持续更新，Linux&#x2F;Nginx 部署更接近真实服务器运维场景。遇到样式和图片加载问题时，也进一步理解了站点根路径、静态资源路径和服务器目录之间的关系。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://cerry-han.github.io/software-tools-practice/2026/07/10/08-software-deployment/" data-id="cmrexl0zl001zsc2cdogr1dth" data-title="实验八 软件部署" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://cerry-han.github.io/software-tools-practice/2026/07/10/08-software-deployment/" data-id="cmrfkrzmm001poa2c2z1h8he7" data-title="实验八 软件部署" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/software-tools-practice/tags/Deploy/" rel="tag">Deploy</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/software-tools-practice/tags/GitHub-Actions/" rel="tag">GitHub Actions</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/software-tools-practice/tags/GitHub-Pages/" rel="tag">GitHub Pages</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/software-tools-practice/tags/Nginx/" rel="tag">Nginx</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/software-tools-practice/tags/rsync/" rel="tag">rsync</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/software-tools-practice/tags/Deploy/" rel="tag">Deploy</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/software-tools-practice/tags/GitHub-Actions/" rel="tag">GitHub Actions</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/software-tools-practice/tags/GitHub-Pages/" rel="tag">GitHub Pages</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/software-tools-practice/tags/Linux/" rel="tag">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/software-tools-practice/tags/Nginx/" rel="tag">Nginx</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/software-tools-practice/tags/rsync/" rel="tag">rsync</a></li></ul>
 
     </footer>
   </div>
@@ -238,7 +391,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://cerry-han.github.io/software-tools-practice/2026/07/10/07-remote-login-management/" data-id="cmrexl0zk001ysc2c0o7p2z70" data-title="实验七 远程登录管理" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://cerry-han.github.io/software-tools-practice/2026/07/10/07-remote-login-management/" data-id="cmrfkrzml001noa2c5gpqhqfl" data-title="实验七 远程登录管理" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -334,7 +487,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://cerry-han.github.io/software-tools-practice/2026/07/10/06-linux-environment-configuration/" data-id="cmrexl0z6000asc2cb1lv5qv0" data-title="实验六 Linux 环境配置" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://cerry-han.github.io/software-tools-practice/2026/07/10/06-linux-environment-configuration/" data-id="cmrfkrzmk001moa2c5c1h82ap" data-title="实验六 Linux 环境配置" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -426,7 +579,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://cerry-han.github.io/software-tools-practice/2026/07/10/05-virtual-machine-installation/" data-id="cmrexl0z50009sc2c30sw1khr" data-title="实验五 虚拟机安装与使用" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://cerry-han.github.io/software-tools-practice/2026/07/10/05-virtual-machine-installation/" data-id="cmrfkrzme0009oa2c38owh1y1" data-title="实验五 虚拟机安装与使用" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -481,7 +634,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://cerry-han.github.io/software-tools-practice/2026/07/10/04-web-site-construction/" data-id="cmrexl0z30006sc2c5k3bdz14" data-title="实验四 Web 站点构建" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://cerry-han.github.io/software-tools-practice/2026/07/10/04-web-site-construction/" data-id="cmrfkrzmc0006oa2c6frf30o7" data-title="实验四 Web 站点构建" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -535,7 +688,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://cerry-han.github.io/software-tools-practice/2026/07/10/03-code-editor-markdown/" data-id="cmrexl0z30005sc2ca2du4a3g" data-title="实验三 代码编辑器与 Markdown" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://cerry-han.github.io/software-tools-practice/2026/07/10/03-code-editor-markdown/" data-id="cmrfkrzmb0004oa2ca44b2z9s" data-title="实验三 代码编辑器与 Markdown" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -591,7 +744,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://cerry-han.github.io/software-tools-practice/2026/07/10/02-web-development-environment/" data-id="cmrexl0z20004sc2c7qv5hsp6" data-title="实验二 Web 软件开发环境" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://cerry-han.github.io/software-tools-practice/2026/07/10/02-web-development-environment/" data-id="cmrfkrzmc0005oa2ce51eg5dv" data-title="实验二 Web 软件开发环境" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -688,7 +841,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://cerry-han.github.io/software-tools-practice/2026/07/10/01-team-division/" data-id="cmrexl0yz0001sc2cgs0kas7d" data-title="小组分工说明" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://cerry-han.github.io/software-tools-practice/2026/07/10/01-team-division/" data-id="cmrfkrzm90001oa2c4cbt9146" data-title="小组分工说明" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -791,7 +944,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://cerry-han.github.io/software-tools-practice/2026/07/10/00-course-overview/" data-id="cmrexl0yv0000sc2ce3es4rnl" data-title="软件开发工具实践课程项目总览" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://cerry-han.github.io/software-tools-practice/2026/07/10/00-course-overview/" data-id="cmrfkrzm60000oa2c7zbscqho" data-title="软件开发工具实践课程项目总览" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
