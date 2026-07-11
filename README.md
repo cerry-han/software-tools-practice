@@ -12,10 +12,10 @@
 |---|---|
 | 何银尧 | 组长/集成负责人：统筹进度、搭建展示站点、整合报告、最终提交 |
 | 龚嫣然 | 远程管理：SSH 服务、免密登录、SCP/rsync 文件传输、远程 Git 仓库验证 |
-| 董晗 | Web 环境与 Hexo：Node.js、npm、Git、Hexo、实验二/四 |
-| 谢娩婷 | 文档与 VS Code：Markdown、插件、实验三 |
-| 任鑫瑜 | Linux/虚拟机：VirtualBox、Ubuntu Server、Linux 命令、环境变量、实验五/六 |
-| 程奕菲 | 部署与验收：GitHub Pages、GitHub Actions、Nginx/虚拟机部署、实验八 |
+| 董晗 | Web 环境与 Hexo：Node.js、npm、Git、Hexo |
+| 谢娩婷 | 文档与 VS Code：Markdown、插件 |
+| 任鑫瑜 | Linux/虚拟机：VirtualBox、Ubuntu Server、Linux 命令、环境变量 |
+| 程奕菲 | 部署与验收：GitHub Pages、GitHub Actions、Nginx/虚拟机部署 |
 
 ## 技术栈
 
